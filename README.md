@@ -10,7 +10,7 @@ The suite validates key user workflows such as login, registration, navigation, 
 ├── tests/               
 │   └── *.test.ts        # individual test files written in TypeScript
 ├── tests-examples/      # Temporary raw output from test executions
-├── test-results/        # Example or sample test files.
+├── test-results/        # Example or sample test files
 ├── playwright.config.ts # Playwright configuration file
 ├── package.json         # Project metadata and scripts
 ├── package-lock.json    # Exact dependency versions for reproducible builds
