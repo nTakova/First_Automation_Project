@@ -30,6 +30,7 @@ test('Create account', async ({ page }) => {
 
     //Fill details: Title, Name, Email, Password, Date of birth
     //да се направи проверка дали name & email са попълнени със същите данни
+
     const inputName: string | null = await page.locator('#name').inputValue();
     console.log(inputName);
     await expect(inputName).toBe(userName);
@@ -74,17 +75,15 @@ test('Create account', async ({ page }) => {
     await page.locator('.btn[data-qa="continue-button"]').click();
 
     //Verify that 'Logged in as username' is visible
-    const valueUserName: string | null = await (page.locator('a:has(i.fa-user)').textContent());
-    const trimmedValue: string | null = (valueUserName as string).trim();
-    await expect(trimmedValue).toBe(`Logged in as ${userName}`);
+    const textUser: string | null = await (page.locator('a:has(i.fa-user)').textContent());
+    const trimmedTextUser = (textUser).trim();
+    await expect(trimmedTextUser).toBe(`Logged in as ${userName}`);
 
-    /* закоментирам изтриването на аканута, за да го използвам за следващите тестове 
     //Click 'Delete Account' button
     await page.locator('a:has(i.fa-trash-o)').click();
 
     //Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
     await expect(page.locator('[data-qa="account-deleted"]')).toContainText('Account Deleted');
     await page.locator('.btn[data-qa="continue-button"]').click();
-*/
 
 });

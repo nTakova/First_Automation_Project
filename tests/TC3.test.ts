@@ -1,47 +1,29 @@
 import { test, expect } from '@playwright/test';
 import { config } from './config';
 
-test ('Invalid login', async ({page}) => {
+test('Invalid login', async ({ page }) => {
     await page.goto('https://automationexercise.com/');
-   
-//Accept coockies
+
+    //Accept cookies
     await page.getByRole('button', { name: 'Consent' }).click();
 
-//Home page is visible
-    //await expect(page.locator('ul.nav.navbar-nav')).toBeVisible();
-    //await expect(page.locator('div').filter({ hasText: 'Home  Products Cart Signup' }).nth(3)).toBeVisible();
-    //await expect(page.locator('.container')).toBeVisible;
-    await expect(page.locator('.navbar-nav')).toBeVisible();
-    
-//Click on Login button
-    //await page.getByRole('link', { name: ' Signup / Login' }).click()
-    //await page.locator('ul.navbar-nav a[href="/login"]').click();
-    await page.locator('i.fa-lock').click();
+    //Home page is visible
+    await expect(page.locator('#slider')).toBeVisible();
 
-    
-//Verify 'Login to your account' is visible
-    //await expect(page.getByText("Login to your account")).toBeVisible();
-    await expect (page.locator('div.login-form')).toBeVisible();
+    //Click on Login button
+    await page.locator('a i.fa-lock').click();
 
-//Enter INcorrect email address and password
-    /*
-    await page.locator('form').filter({ hasText: 'Login' }).getByPlaceholder('Email Address').click();
-    await page.locator('form').filter({ hasText: 'Login' }).getByPlaceholder('Email Address').fill('testcase2@test.bg');
-    await page.getByRole("textbox", {name:"password"}).click();
-    await page.getByRole("textbox", {name:"password"}).fill('test');
-    await page.locator('div.login-form input[name="email"]').fill('test13@mail.com');
-    await page.locator('div.login-form input[name="password"]').fill('test');
-    */
-    await page.locator('[data-qa="login-email"]').fill('testFriday1@looong.meeee');
-    await page.locator('[data-qa="login-password"]').fill(config.password);
+    //Verify 'Login to your account' is visible
+    await expect(page.locator('div.login-form')).toContainText('Login to your account');
 
-//Click 'login' button
-    //await page.getByRole("button", {name:"Login"}).click();
-    //await page.locator('div.login-form button[type="submit"]').click();
-    await page.locator('[data-qa="login-button"]').click();
+    //Enter INcorrect email address and password
+    await page.locator('input[data-qa="login-email"]').fill('testFriday1@looong.meeee');
+    await page.locator('input[data-qa="login-password"]').fill(config.password);
 
-//Verify error 'Your email or password is incorrect!' is visible
-    //await page.getByText("Your email or password is incorrect!");
-    //await expect (page.getByText("Your email or password is incorrect!")).toBeVisible();
-    await expect (page.locator('p[style="color: red;"]')).toBeVisible();
+    //Click 'login' button
+    await page.locator('button[data-qa="login-button"]').click();
+
+    //Verify error 'Your email or password is incorrect!' is visible
+    await expect(page.locator('[action="/login"] p')).toContainText('Your email or password is incorrect!');
+
 });
