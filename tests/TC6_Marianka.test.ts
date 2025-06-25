@@ -8,21 +8,19 @@ test("Contact form", async ({ page }) => {
   await page.getByRole("button", { name: "Consent" }).click();
 
   // Home page is visible
-  await expect(page.locator(".navbar-nav")).toBeVisible();
+  await expect(page.locator('#slider')).toBeVisible();
 
   // Click on 'Contact Us' button
-  await page.locator(".fa-envelope").click();
+  await page.locator('a', { has: page.locator('i.fa-envelope') }).click();
 
   // Verify 'GET IN TOUCH' is visible
-  await expect(
-    page.locator("h2.title", { hasText: " Get In Touch" })
-  ).toBeVisible();
+  await expect(page.locator('.contact-form .text-center')).toHaveText('Get In Touch');
 
   // Enter name, email, subject and message
-  await page.locator('[data-qa="name"]').fill("test");
-  await page.locator('[data-qa="email"]').fill("avi.test@mail.bg");
-  await page.locator('[data-qa="subject"]').fill("test");
-  await page.locator('[data-qa="message"]').fill("test");
+  await page.locator('input[data-qa="name"]').fill("test");
+  await page.locator('input[data-qa="email"]').fill("avi.test@mail.bg");
+  await page.locator('input[data-qa="subject"]').fill("test");
+  await page.locator('textarea[data-qa="message"]').fill("test");
 
   // Upload file
   await page
@@ -35,11 +33,11 @@ test("Contact form", async ({ page }) => {
   });
 
   // Click the submit button to send the contact form and wait for the page to finish loading after the form is submitted
-  await page.locator('[name="submit"]').click();
+  await page.locator('input[name="submit"]').click();
   await page.waitForLoadState("load");
 
   // Verify success message is visible
-  await expect(page.locator("div.status.alert-success")).toBeVisible();
+  await expect(page.locator('div.status.alert.alert-success')).toHaveText('Success! Your details have been submitted successfully.');
 
   // Click 'Home' button and verify landing on home page
   await page.locator(".contact-form .btn").click();

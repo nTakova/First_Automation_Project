@@ -11,10 +11,10 @@ test('Valid login', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on Login button
-    await page.locator('a i.fa-lock').click();
+    await page.locator('a', { has: page.locator('i.fa-lock') }).click();
 
     //Verify 'Login to your account' is visible
-    await expect(page.locator('div.login-form')).toContainText('Login to your account');
+    await expect(page.locator('div.login-form h2')).toHaveText('Login to your account');
 
     //Enter correct email address and password
     await page.locator('input[data-qa="login-email"]').fill(config.email);
@@ -24,13 +24,11 @@ test('Valid login', async ({ page }) => {
     await page.locator('button[data-qa="login-button"]').click();
 
     //Verify that 'Logged in as username' is visible
-    const userName: string = "TEST";
-    const valueUserName: string | null = await (page.locator('a:has(i.fa-user)').textContent());
-    const trimmedValue: string | null = (valueUserName as string).trim();
-    await expect(trimmedValue).toBe(`Logged in as ${userName}`);
+    const valueUserName: string = (await page.locator("a", { has: page.locator("i.fa-user") }).textContent())!.trim();
+    expect(valueUserName).toBe(`Logged in as ${config.userName}`);
 
     //Click 'Logout' button
-    await page.locator('.fa-lock').click();
+    await page.locator('a', { has: page.locator('i.fa-lock') }).click();
 
     //Verify that user is navigated to login page
     await expect(page).toHaveURL('https://automationexercise.com/login');

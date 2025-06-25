@@ -7,25 +7,27 @@ test('Verify address details in checkout page', async ({ page }) => {
     //accept cookies
     await page.getByRole('button', { name: 'Consent' }).click();
 
+    //block adds
+    await page.route('**/*adsbygoogle*', route => route.abort());
+
     //home page is opened
-    //await expect(page.locator('.navbar-nav')).toBeVisible();
     await expect(page.locator('#slider')).toBeVisible();
 
     //click on Login button
-    await page.locator('i.fa-lock').click();
+    await page.locator('a', { has: page.locator('i.fa-lock') }).click();
 
     //Verify 'New User Signup!' is visible
-    expect(await page.locator('div.signup-form')).toBeVisible();
+    await expect(page.locator('div.signup-form h2')).toHaveText("New User Signup!");
 
     //Enter name and email address
     await page.locator('input[data-qa="signup-name"]').fill(config.userName);
     await page.locator('input[data-qa="signup-email"]').fill(config.email23);
 
     //Click 'Signup' button
-    await page.locator('[data-qa="signup-button"]').click();
+    await page.locator('button[data-qa="signup-button"]').click();
 
     //Verify that 'ENTER ACCOUNT INFORMATION' is visible
-    await expect(page.locator('div.login-form')).toContainText('Enter Account Information');
+    await expect(page.locator('div.login-form h2').first()).toHaveText('Enter Account Information');
 
     //Fill details: Title, Name, Email, Password, Date of birth
     await page.locator('#uniform-id_gender2').click();
@@ -68,119 +70,159 @@ test('Verify address details in checkout page', async ({ page }) => {
     await page.locator('button[data-qa="create-account"]').click();
 
     //Verify that 'ACCOUNT CREATED!' is visible
-    await expect(page.locator('h2[data-qa="account-created"]')).toContainText('Account Created!');
+    await expect(page.locator('h2[data-qa="account-created"]')).toHaveText('Account Created!');
 
     //Click 'Continue' button
-    await page.locator('.btn[data-qa="continue-button"]').click();
+    await page.locator('a[data-qa="continue-button"]').click();
 
     //Verify that 'Logged in as username' is visible
-    const userName: string = "TEST";
-    const valueUserName: string | null = await (page.locator('a:has(i.fa-user)').textContent());
-    const trimmedValue: string = (valueUserName as string).trim();
-    await expect(trimmedValue).toBe(`Logged in as ${userName}`);
+    const valueUserName: string = (await page.locator("a", { has: page.locator("i.fa-user") }).textContent())!.trim();
+    await expect(valueUserName).toBe(`Logged in as ${config.userName}`);
+
+    //additional step = to get the details of the products -> view product
+    await page.locator('.product-image-wrapper').locator('i.fa-plus-square').first().click();
+    const productDescription: string = (await page.locator('.product-information h2').textContent())!;
+    const productPrice: string = (await page.locator('.product-information span span').textContent())!;
+
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+
+    await page.locator('.product-image-wrapper').locator('i.fa-plus-square').nth(1).click();
+    const productDescription2: string = (await page.locator('.product-information h2').textContent())!;
+    const productPrice2: string = (await page.locator('.product-information span span').textContent())!;
 
     //click Products button
-    await page.locator('.card_travel').click();
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
 
     //Add products to cart 
     await page.locator('ul.navbar-nav a[href="/products"]').click();
 
-
-    const productCard: Locator = page.locator('.product-image-wrapper')
-        .filter({
-            has: page.locator('[data-product-id="1"]'),
-        });
-    await productCard.hover();
-
-    const overlayContent: Locator = productCard.locator('.overlay-content')
-        .filter({ has: page.locator('[data-product-id="1"]') });
-    const addToCartButton = overlayContent.locator('.fa-shopping-cart');
-
-    await addToCartButton.click();
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+    const firstItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('a[data-product-id="1"]') });
+    await firstItem.hover();
+    firstItem.locator('.overlay-content').locator('a[data-product-id="1"]').click();
 
     //Click 'Continue Shopping' button
     await expect(page.locator('#cartModal')).toBeVisible();
     await page.locator('.btn-block').click();
 
     //Hover over second product and click 'Add to cart'
-
-    const productCard2: Locator = page.locator('.product-image-wrapper')
-        .filter({
-            has: page.locator('[data-product-id="2"]'),
-        });
-    await productCard2.hover();
-
-    const overlayContent2: Locator = productCard2.locator('.overlay-content')
-        .filter({ has: page.locator('[data-product-id="2"]') });
-    const addToCartButton2 = overlayContent2.locator('.fa-shopping-cart');
-    await addToCartButton2.click();
-
-    const firstProduct: Locator = page.locator('.single-products').first();
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+    const secondItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('a[data-product-id="2"]') });
+    await secondItem.hover();
+    await secondItem.locator('.overlay-content').locator('a[data-product-id="2"]').click();
 
     //Click 'Cart' button
-    await page.locator('.navbar-nav a[href="/view_cart"]').click();
+    await page.locator('a[href="/view_cart"]', {
+        has: page.locator('i.fa-shopping-cart')
+    }).filter({
+        hasText: 'Cart'
+    }).click();
 
     //Verify that cart page is displayed
     await expect(page).toHaveURL('https://automationexercise.com/view_cart');
+
+    //additional - get the details of the products
+    const productCartQuantity: string = (await page.locator('#product-1 .cart_quantity').textContent())!.trim();
+    const productTotalPrice: string = (await page.locator('#product-1 .cart_total_price').textContent())!.trim();
+    const productCartQuantity2: string = (await page.locator('#product-2 .cart_quantity').textContent())!.trim();
+    const productTotalPrice2: string = (await page.locator('#product-2 .cart_total_price').textContent())!.trim();
 
     //Click Proceed To Checkout
     await page.locator('.btn-default.check_out').click();
 
     //Verify that the delivery address is same address filled at the time registration of account
 
-    //променливи за данните, които се попълват в логин формата, след това - срявняване на данните - expect to be
-    //извличане на данните от формата, сравняване с попълнените 
-
-    const firstNameValue: string | null = await page.locator('#address_delivery .address_firstname').textContent();
-    expect(firstNameValue).toContain(`Mrs. ${firstName} ${lastName}`);
+    const firstNameValue: string = (await page.locator('#address_delivery .address_firstname').textContent())!;
+    expect(firstNameValue).toBe(`Mrs. ${firstName} ${lastName}`);
 
     //company
-    const companyValue: string | null = await page.locator('#address_delivery .address_address1.address_address2').first().innerText();
-    expect(companyValue).toContain(company);
+    const companyValue: string = (await page.locator('#address_delivery .address_address1.address_address2').first().innerText())!;
+    expect(companyValue).toBe(company);
 
     //address1
-    const addressValue: string | null = await page.locator('#address_delivery .address_address1.address_address2').nth(1).innerText();
-    expect(addressValue).toContain(address1);
+    const addressValue: string = (await page.locator('#address_delivery .address_address1.address_address2').nth(1).innerText())!;
+    expect(addressValue).toBe(address1);
 
     //address2
-    const addressValue2: string | null = await page.locator('#address_delivery .address_address1.address_address2').last().innerText();
-    expect(addressValue2).toContain(address2);
+    const addressValue2: string = (await page.locator('#address_delivery .address_address1.address_address2').last().innerText())!;
+    expect(addressValue2).toBe(address2);
 
-    const zipCodeValue: string | null = await page.locator('#address_delivery .address_postcode').textContent();
+    const zipCodeValue: string = (await page.locator('#address_delivery .address_postcode').textContent())!;
     const cleanZipCode: string = (zipCodeValue as string).replace(/\s+/g, ' ').trim();
-    expect(cleanZipCode).toContain(`${city} ${state} ${zipCode}`);
+    expect(cleanZipCode).toBe(`${city} ${state} ${zipCode}`);
 
-    const countryValue: string | null = await page.locator('#address_delivery .address_country_name').textContent();
-    expect(countryValue).toContain(country);
+    const countryValue: string = (await page.locator('#address_delivery .address_country_name').textContent())!;
+    expect(countryValue).toBe(country);
 
-    const mobileValue: string | null = await page.locator('#address_delivery .address_phone').textContent();
-    expect(mobileValue).toContain(mobile);
+    const mobileValue: string = (await page.locator('#address_delivery .address_phone').textContent())!;
+    expect(mobileValue).toBe(mobile);
 
 
     //Verify that the billing address is same address filled at the time registration of account
-    const firstNameValue2: string | null = await page.locator('#address_invoice .address_firstname').textContent();
-    expect(firstNameValue2).toContain(`Mrs. ${firstName} ${lastName}`);
+    const firstNameValue2: string = (await page.locator('#address_invoice .address_firstname').textContent())!;
+    expect(firstNameValue2).toBe(`Mrs. ${firstName} ${lastName}`);
 
-    const zipCodeValue2: string | null = await page.locator('#address_invoice .address_postcode').textContent();
-    const cleanZipCode2: string | null = (zipCodeValue2 as string).replace(/\s+/g, ' ').trim();
-    expect(cleanZipCode2).toContain(`${city} ${state} ${zipCode}`);
+    const zipCodeValue2: string = (await page.locator('#address_invoice .address_postcode').textContent())!;
+    const cleanZipCode2: string = ((zipCodeValue2 as string).replace(/\s+/g, ' ').trim())!;
+    expect(cleanZipCode2).toBe(`${city} ${state} ${zipCode}`);
 
-    const countryValue2: string | null = await page.locator('#address_invoice .address_country_name').textContent();
-    expect(countryValue2).toContain(country);
+    const countryValue2: string = (await page.locator('#address_invoice .address_country_name').textContent())!;
+    expect(countryValue2).toBe(country);
 
-    const mobileValue2: string | null = await page.locator('#address_invoice .address_phone').textContent();
-    expect(mobileValue2).toContain(mobile);
+    const mobileValue2: string = (await page.locator('#address_invoice .address_phone').textContent())!;
+    expect(mobileValue2).toBe(mobile);
 
 
-    //Verify Address Details and Review Your Order
-    await expect(page.locator('.step-one').filter({ hasText: "Address Details" })).toBeVisible();
-    // ще го заменя с toContainText("Address Details"/ "Review your order"), но има два едни и същи локатора? h2 class heading
+    //Verify Review Your Order
+    await expect(page.locator('.step-one .heading').last()).toHaveText("Review Your Order");
+
+    const cartTableRows: number = await page.locator('tbody tr[id^="product-"]').count();
+    expect(cartTableRows).toEqual(2);
+
+
+    const cartTableProduct1: Locator = page.locator('tbody tr[id="product-1"]');
+
+    const cartDescription: string = (await cartTableProduct1.locator('.cart_description h4').textContent())!.trim();
+    //const cartPrice: string = (await cartTableProduct1.locator('.cart_price').textContent())!.trim();
+    const rawTextPrice = await cartTableProduct1.locator('.cart_price').textContent();
+    const cartPrice: string = rawTextPrice ? rawTextPrice.replace(/\s+/g, '') : '';
+
+    //const cartQuantity: string = (await cartTableProduct1.locator('.cart_quantity').textContent())!.trim();
+    const rawTextQuantity = await cartTableProduct1.locator('.cart_quantity').textContent();
+    const cartQuantity: string = rawTextQuantity ? rawTextQuantity.replace(/\s+/g, '') : '';
+
+    const cartTotal: string = (await cartTableProduct1.locator('.cart_total').textContent())!.trim();
+
+    expect(cartDescription).toBe(productDescription);
+    //expect(cartPrice).toBe(productPrice);
+    console.log(cartPrice);
+    console.log(productPrice);
+    expect(cartQuantity).toBe(productCartQuantity);
+    expect(cartTotal).toBe(productTotalPrice);
+
+
+    const cartTableProduct2: Locator = page.locator('tbody tr[id="product-2"]');
+
+    const cartDescription2: string = (await cartTableProduct2.locator('.cart_description h4').textContent())!.trim();
+    //const cartPrice2: string = (await cartTableProduct2.locator('.cart_price').textContent())!.trim();
+    const rawTextPrice2 = await cartTableProduct2.locator('.cart_price').textContent();
+    const cartPrice2: string = rawTextPrice2 ? rawTextPrice2.replace(/\s+/g, '') : '';
+
+    //const cartQuantity2: string = (await cartTableProduct2.locator('.cart_quantity').textContent())!.trim();
+    const rawTextQuantity2 = await cartTableProduct2.locator('.cart_quantity').textContent();
+    const cartQuantity2: string = rawTextQuantity2 ? rawTextQuantity2.replace(/\s+/g, '') : '';
+
+    const cartTotal2: string = (await cartTableProduct2.locator('.cart_total').textContent())!.trim();
+
+    expect(cartDescription2).toBe(productDescription2);
+    //expect(cartPrice2).toBe(productPrice2);
+    expect(cartQuantity2).toBe(productCartQuantity2);
+    expect(cartTotal2).toBe(productTotalPrice2);
 
     //Click 'Delete Account' button
-    await page.locator('a:has(i.fa-trash-o)').click();
+    await page.locator('a', { has: page.locator('i.fa-trash-o') }).click();
 
     //Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
-    await expect(page.locator('[data-qa="account-deleted"]')).toContainText('Account Deleted');
-    await page.locator('.btn[data-qa="continue-button"]').click();
-
+    await expect(page.locator('h2[data-qa="account-deleted"]')).toHaveText('Account Deleted!');
+    await page.locator('a[data-qa="continue-button"]').click();
 });

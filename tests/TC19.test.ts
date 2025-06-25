@@ -11,18 +11,18 @@ test('View Cart Brand produts', async ({ page }) => {
 
     //  Verify that Brands are visible on left side bar
     await expect(page.locator('.brands-name')).toBeVisible();
-    await expect(page.locator('.brands-name')).toContainText('Brands');
+    await expect(page.locator('.brands_products h2')).toHaveText('Brands');
 
     //Click on any brand name
-    await page.locator('[href="/brand_products/Polo"]').click();
+    await page.locator('.brands-name ul li').first().click();
 
     //Verify that user is navigated to brand page and brand products are displayed
-    await expect(page.locator('.text-center').filter({ hasText: "Brand - Polo Products" })).toBeVisible();
+    await expect(page.locator('.features_items h2.text-center')).toHaveText('Brand - Polo Products');
 
     //On left side bar, click on any other brand link
-    await page.locator('[href="/brand_products/Madame"]').click();
+    await page.locator('.brands-name ul li').last().click();
 
     //Verify that user is navigated to that brand page and can see products
-    await expect(page.locator('.text-center').filter({ hasText: "Brand - Madame Products" })).toBeVisible();
+    await expect(page.locator('.features_items h2.text-center')).toHaveText("Brand - Biba Products");
 
 });

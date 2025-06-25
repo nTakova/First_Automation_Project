@@ -9,7 +9,7 @@ test('Verify all products', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on Products button
-    await page.locator('.card_travel').click();
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
 
     //Verify user is navigated to ALL PRODUCTS page successfully
     await expect(page).toHaveURL('https://automationexercise.com/products');
@@ -18,17 +18,25 @@ test('Verify all products', async ({ page }) => {
     await expect(page.locator('div.features_items')).toBeVisible();
 
     //Click on 'View Product' of first product
-    await page.locator('.col-sm-4').first();
-    await (page.locator('i.fa-plus-square')).first().click();
+    await page.locator('.product-image-wrapper').locator('i.fa-plus-square').first().click();
 
     //User is landed to product detail page
     expect(page.url()).toContain('https://automationexercise.com/product_details');
 
     //Verify that detail is visible: product name, category, price, availability, condition, brand
-    await expect(page.locator('.product-information h2')).toContainText("Blue Top");
-    await expect(page.locator('.product-information p').nth(0)).toContainText('Category');
-    await expect(page.locator('.product-information span span')).toContainText('Rs.');
-    await expect(page.locator('.product-information p').nth(1)).toContainText('Availability:');
-    await expect(page.locator('.product-information p').nth(2)).toContainText('Condition:');
-    await expect(page.locator('.product-information p').nth(3)).toContainText('Brand:');
+
+    const productDescription: string = (await page.locator('.product-information h2').textContent())!;
+    const productInformation: string = (await (page.locator('.product-information p').nth(0)).textContent())!;
+    const productPrice: string = (await page.locator('.product-information span span').textContent())!;
+    const productAvailability: string = (await (page.locator('.product-information p').nth(1)).textContent())!;
+    const productCondition: string = (await (page.locator('.product-information p').nth(2)).textContent())!;
+    const productBrand: string = (await (page.locator('.product-information p').nth(3)).textContent())!;
+
+    //тук съм оставила стринговете, тъй като няма с какво друго да ги сравня освен с product details страницата, от която взимам textContent
+    expect(productDescription).toBe("Blue Top");
+    expect(productInformation).toBe('Category: Women > Tops');
+    expect(productPrice).toBe('Rs. 500');
+    expect(productAvailability).toBe('Availability: In Stock');
+    expect(productCondition).toBe('Condition: New');
+    expect(productBrand).toBe('Brand: Polo');
 });

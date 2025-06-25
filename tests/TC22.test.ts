@@ -12,17 +12,15 @@ test('Add to card from Recommended items', async ({ page }) => {
     //Scroll to bottom of page
 
     //Verify 'RECOMMENDED ITEMS' are visible
-    await expect(page.locator('.recommended_items', { has: page.locator('.text-center') })).toContainText('recommended items');
+    //await expect(page.locator('.recommended_items', { has: page.locator('.text-center') })).toContainText('recommended items');
+    await expect(page.locator('h2.title.text-center').last()).toHaveText('recommended items');
 
     //Click on 'Add To Cart' on Recommended product
-    const recomProduct: Locator = page.locator('#recommended-item-carousel');
-    const firstProduct: Locator = recomProduct.locator('[data-product-id="1"]');
-    await firstProduct.click();
+    await page.locator('#recommended-item-carousel').locator('a[data-product-id="1"]').click();
 
     //Click on 'View Cart' button
-    await expect(page.locator('#cartModal')).toBeVisible();
-    const viewCart: Locator = page.locator('.modal-body a[href="/view_cart"]');
-    await viewCart.click();
+    await expect(page.locator('.modal-content')).toBeVisible();
+    await page.locator('.modal-body a[href="/view_cart"]').click();
 
     //Verify that product is displayed in cart page
     await expect(page.locator('#product-1')).toBeVisible();

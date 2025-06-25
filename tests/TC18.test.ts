@@ -18,22 +18,18 @@ test('View Category produts', async ({ page }) => {
     await page.getByRole('link', { name: 'Women' }).click();
 
     //Click on any category link under 'Women' category, for example: Dress
-    await page.locator('[href="/category_products/1"]').click();
-    //await page.getByRole('link', { name: 'Dress' }).click();
+    //await page.locator('[href="/category_products/1"]').click();
+    await page.getByRole('link', { name: 'Dress' }).click();
 
     //Verify that category page is displayed and confirm text 'WOMEN - TOPS PRODUCTS'
-    await expect(
-        page.locator('.features_items h2').filter({ hasText: 'Women - Dress Products' })
-    ).toBeVisible();
+    await expect(page.locator('.features_items h2.text-center')).toHaveText('Women - Dress Products');
 
 
     //On left side bar, click on any sub-category link of 'Men' category
-    await page.locator('[href="#Men"]').click();
-    await page.locator('[href="/category_products/3"]').click();
+    await page.locator('a[href="#Men"]').click();
+    await page.locator('a[href="/category_products/3"]').click();
 
     //Verify that user is navigated to that category page
-    await expect(
-        page.locator('.features_items h2').filter({ hasText: 'Men - Tshirts Products' })
-    ).toBeVisible();
+    await expect(page.locator('.features_items h2.text-center')).toHaveText('Men - Tshirts Products');
 
 });

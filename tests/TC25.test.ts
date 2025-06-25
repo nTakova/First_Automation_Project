@@ -23,5 +23,4 @@ test('Add to card from Recommended items', async ({ page }) => {
         page.locator('.carousel-inner')
             .filter({ hasText: "Full-Fledged practice website for Automation Engineers" }))
         .toBeVisible({ timeout: 5000 });
-    //await expect(page.locator('.carousel-inner')).toContainText('Full-Fledged practice website for Automation Engineers', { timeout: 5000 });
 });

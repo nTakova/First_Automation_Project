@@ -11,10 +11,10 @@ test('Invalid login', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on Login button
-    await page.locator('a i.fa-lock').click();
+    await page.locator('a', { has: page.locator('i.fa-lock') }).click();
 
     //Verify 'Login to your account' is visible
-    await expect(page.locator('div.login-form')).toContainText('Login to your account');
+    await expect(page.locator('div.login-form h2')).toHaveText('Login to your account');
 
     //Enter INcorrect email address and password
     await page.locator('input[data-qa="login-email"]').fill('testFriday1@looong.meeee');
@@ -24,6 +24,5 @@ test('Invalid login', async ({ page }) => {
     await page.locator('button[data-qa="login-button"]').click();
 
     //Verify error 'Your email or password is incorrect!' is visible
-    await expect(page.locator('[action="/login"] p')).toContainText('Your email or password is incorrect!');
-
+    await expect(page.locator('form[action="/login"] p')).toHaveText('Your email or password is incorrect!');
 });

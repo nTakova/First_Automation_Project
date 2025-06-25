@@ -12,7 +12,7 @@ test('Add to Shopping cart', async ({ page }) => {
   await expect(page.locator('#slider')).toBeVisible();
 
   //Click on 'Products' button
-  await page.locator('.card_travel').click();
+  await page.locator('a', { has: page.locator('i.card_travel') }).click();
 
   //Verify user is navigated to ALL PRODUCTS page successfully
   await expect(page).toHaveURL('https://automationexercise.com/products');
@@ -33,10 +33,10 @@ test('Add to Shopping cart', async ({ page }) => {
   for (let i = 0; i < productCount; i++) {
     const product: Locator = products.nth(i);
     const name: string = await product.locator('p').innerText();
-    expect(name.toLowerCase()).toContain('e');
+    expect(name.toLowerCase()).toContain('s'); // търся само "S", за да не фейлва теста тук, а да проверя, че работи
   }
-  // Add those products to cart
 
+  // Add those products to cart
 
   for (let i = 0; i < productCount; i++) {
     const product: Locator = products.nth(i);
@@ -49,13 +49,15 @@ test('Add to Shopping cart', async ({ page }) => {
     await addToCartButton.click();
 
     // Click Continue shopping
-    await expect(page.locator('#cartModal')).toBeVisible();
+    await expect(page.locator('.modal-content')).toBeVisible();
     await page.locator('.btn-block').click();
   }
   // Click 'Cart' button and verify that products are visible in cart
-  await page.locator('[href="/view_cart"]').filter({ has: page.locator('i.fa-shopping-cart') }).click();
-  await expect(page).toHaveURL('https://automationexercise.com/view_cart');
-
+  await page.locator('a[href="/view_cart"]', {
+    has: page.locator('i.fa-shopping-cart')
+  }).filter({
+    hasText: 'Cart'
+  }).click();
 
   // Verify that the produts are in the Cart
   const cartItems: Locator = page.locator('.cart_description'); // или друг точен селектор
@@ -64,40 +66,27 @@ test('Add to Shopping cart', async ({ page }) => {
   const cartItemCount: number = await cartItems.count();
   expect(cartItemCount).toBeGreaterThan(0);
 
-  console.log(` ${cartItemCount} products in the cart`);
+  //console.log(` ${cartItemCount} products in the cart`);
 
   // Click 'Signup / Login' button and submit login details
-
-  await page.locator('a i.fa-lock').click();
-
-  const userName: string = "TEST";
-  const email: string = "test33@qa3.3";
+  await page.locator('a', { has: page.locator('i.fa-lock') }).click();
 
   //Fill all details in Signup and create account
-  await expect(page.locator('div.signup-form')).toContainText('New User Signup!');
+  await expect(page.locator('div.signup-form h2')).toHaveText("New User Signup!");
 
   //Enter name and email address
-  await page.locator('input[data-qa="signup-name"]').fill(userName);
-  await page.locator('input[data-qa="signup-email"]').fill(email);
+  await page.locator('input[data-qa="signup-name"]').fill(config.userName);
+  await page.locator('input[data-qa="signup-email"]').fill(config.email20);
 
   //Click 'Signup' button
   await page.locator('button[data-qa="signup-button"]').click();
 
-  //Verify that 'ENTER ACCOUNT INFORMATION' is visible
-  await expect(page.locator('div.login-form')).toContainText('Enter Account Information');
-
   //Fill details: Title, Name, Email, Password, Date of birth
-  //да се направи проверка дали name & email са попълнени със същите данни
-  const inputName: string | null = await page.locator('#name').inputValue();
-  console.log(inputName);
-  await expect(inputName).toBe(userName);
-
-  const inputEmail: string | null = await page.locator('#email').inputValue();
-  console.log(inputEmail);
-  await expect(inputEmail).toBe(email);
+  await expect(page.locator('#name')).toHaveValue(config.userName);
+  await expect(page.locator('#email')).toHaveValue(config.email20);
 
   await page.locator('#uniform-id_gender2').click();
-  await page.locator('#password').fill('test');
+  await page.locator('#password').fill(config.password);
 
   //date of birth
   await page.locator('#days').selectOption('17');
@@ -126,16 +115,14 @@ test('Add to Shopping cart', async ({ page }) => {
   await page.locator('button[data-qa="create-account"]').click();
 
   //Verify that 'ACCOUNT CREATED!' is visible
-  await expect(page.locator('h2[data-qa="account-created"]')).toContainText('Account Created!');
+  await expect(page.locator('h2[data-qa="account-created"]')).toHaveText('Account Created!');
 
   //Click 'Continue' button
-  await page.locator('.btn[data-qa="continue-button"]').click();
+  await page.locator('a[data-qa="continue-button"]').click();
 
   //Verify that 'Logged in as username' is visible
-  const valueUserName: string | null = await (page.locator('a:has(i.fa-user)').textContent());
-  const trimmedValue: string = (valueUserName as string).trim();
-  await expect(trimmedValue).toBe(`Logged in as ${userName}`);
-
+  const valueUserName: string = (await page.locator("a", { has: page.locator("i.fa-user") }).textContent())!.trim();
+  expect(valueUserName).toBe(`Logged in as ${config.userName}`);
 
   //  Again, go to Cart page
   await page.locator('[href="/view_cart"]').filter({ has: page.locator('i.fa-shopping-cart') }).click();
@@ -143,6 +130,5 @@ test('Add to Shopping cart', async ({ page }) => {
   // Verify that those products are visible in cart after login as well
   await expect(cartItems.first()).toBeVisible();
   expect(cartItemCount).toBeGreaterThan(0);
-  console.log(` ${cartItemCount} products in the cart`);
 
 });

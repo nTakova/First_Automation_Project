@@ -12,13 +12,13 @@ test('Subscription', async ({ page }) => {
     //Scroll down to footer
 
     //Verify text 'SUBSCRIPTION'
-    await expect(page.locator('div.single-widget')).toContainText("Subscription");
+    await expect(page.locator('div.single-widget h2')).toHaveText("Subscription");
 
     //Enter email address in input and click arrow button
     await page.locator('#susbscribe_email').fill("test@mail.f");
     await page.locator('#subscribe').click();
 
     //Verify success message 'You have been successfully subscribed!' is visible
-    await expect(page.locator('#success-subscribe')).toContainText('You have been successfully subscribed!');
+    await expect(page.locator('#success-subscribe')).toHaveText('You have been successfully subscribed!');
 });
 

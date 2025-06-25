@@ -10,7 +10,7 @@ test('Subscription', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on 'Cart' button
-    await page.locator('i.fa-shopping-cart').click();
+    await page.locator('a[href="/view_cart"]', { has: page.locator('i.fa-shopping-cart') }).filter({ hasText: 'Cart' }).click();
 
     //Verify user is navigated to CART page successfully
     await expect(page).toHaveURL('https://automationexercise.com/view_cart');
@@ -23,6 +23,6 @@ test('Subscription', async ({ page }) => {
     await page.locator('#subscribe').click();
 
     //Verify success message 'You have been successfully subscribed!' is visible
-    await expect(page.locator('#success-subscribe')).toContainText('You have been successfully subscribed!');
+    await expect(page.locator('#success-subscribe')).toHaveText('You have been successfully subscribed!');
 
 });

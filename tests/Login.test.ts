@@ -11,32 +11,24 @@ test('Create account', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //click on Login button
-    await page.locator('a i.fa-lock').click();
+    await page.locator('a', { has: page.locator('i.fa-lock') }).click();
 
     //Verify 'New User Signup!' is visible
-    await expect(page.locator('div.signup-form')).toContainText('New User Signup!');
+    await expect(page.locator('div.signup-form h2')).toHaveText("New User Signup!");
 
     //Enter name and email address
-    const userName: string = "TEST";
-    const email: string = config.email;
-    await page.locator('input[data-qa="signup-name"]').fill(userName);
-    await page.locator('input[data-qa="signup-email"]').fill(email);
+    await page.locator('input[data-qa="signup-name"]').fill(config.userName);
+    await page.locator('input[data-qa="signup-email"]').fill(config.email);
 
     //Click 'Signup' button
     await page.locator('button[data-qa="signup-button"]').click();
 
     //Verify that 'ENTER ACCOUNT INFORMATION' is visible
-    await expect(page.locator('div.login-form')).toContainText('Enter Account Information');
+    await expect(page.locator('div.login-form h2').first()).toHaveText('Enter Account Information');
 
     //Fill details: Title, Name, Email, Password, Date of birth
-    //да се направи проверка дали name & email са попълнени със същите данни
-    const inputName: string | null = await page.locator('#name').inputValue();
-    console.log(inputName);
-    await expect(inputName).toBe(userName);
-
-    const inputEmail: string | null = await page.locator('#email').inputValue();
-    console.log(inputEmail);
-    await expect(inputEmail).toBe(email);
+    await expect(page.locator('#name')).toHaveValue(userName);
+    await expect(page.locator('#email')).toHaveValue(email);
 
     await page.locator('#uniform-id_gender2').click();
     await page.locator('#password').fill(config.password);
@@ -68,23 +60,23 @@ test('Create account', async ({ page }) => {
     await page.locator('button[data-qa="create-account"]').click();
 
     //Verify that 'ACCOUNT CREATED!' is visible
-    await expect(page.locator('h2[data-qa="account-created"]')).toContainText('Account Created!');
+    await expect(page.locator('h2[data-qa="account-created"]')).toHaveText('Account Created!');
 
     //Click 'Continue' button
-    await page.locator('.btn[data-qa="continue-button"]').click();
+    await page.locator('a[data-qa="continue-button"]').click();
 
     //Verify that 'Logged in as username' is visible
-    const valueUserName: string | null = await (page.locator('a:has(i.fa-user)').textContent());
-    const trimmedValue: string | null = (valueUserName as string).trim();
-    await expect(trimmedValue).toBe(`Logged in as ${userName}`);
+    const valueUserName: string = (await page.locator("a", { has: page.locator("i.fa-user") }).textContent())!.trim();
+    expect(valueUserName).toBe(`Logged in as ${userName}`);
 
-    /* закоментирам изтриването на аканута, за да го използвам за следващите тестове 
+    /* закоментирам изтриването на аканута, за да го използвам за следващите тестове
     //Click 'Delete Account' button
-    await page.locator('a:has(i.fa-trash-o)').click();
+    await page.locator('a', { has: page.locator('i.fa-trash-o') }).click();
 
     //Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
-    await expect(page.locator('[data-qa="account-deleted"]')).toContainText('Account Deleted');
-    await page.locator('.btn[data-qa="continue-button"]').click();
-*/
+    await expect(page.locator('h2[data-qa="account-deleted"]')).toHaveText('Account Deleted!');
+    await page.locator('a[data-qa="continue-button"]').click();
+
+    */
 
 });

@@ -10,16 +10,16 @@ test('Add review on product', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on 'Products' button
-    await page.locator('.card_travel').click();
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
 
     //Verify user is navigated to ALL PRODUCTS page successfully
-    await expect(page.locator('h2.text-center')).toContainText("All Products");
+    await expect(page.locator('h2.text-center')).toHaveText("All Products");
 
     //Click on 'View Product' button  
     await page.locator('ul.nav-pills a[href="/product_details/1"]').click();
 
     //Verify 'Write Your Review' is visible
-    await expect(page.locator('.nav-tabs')).toBeVisible();
+    await expect(page.locator('.nav-tabs')).toHaveText('Write Your Review');
 
     //Enter name, email and review
     await page.locator('#name').fill('test');
@@ -35,6 +35,7 @@ test('Add review on product', async ({ page }) => {
         page.click('#button-review'), // кликът, който задейства и съобщението, и навигацията
         page.waitForLoadState() // изчакваме навигацията след това
     ]);
-    console.log('Success message:', messageText);
+
+    expect(messageText?.trim()).toBe("Thank you for your review.")
 
 });

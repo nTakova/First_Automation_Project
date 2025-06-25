@@ -7,73 +7,87 @@ test('Order - register while checkout', async ({ page }) => {
     //Accept cookies
     await page.getByRole('button', { name: 'Consent' }).click();
 
+    //block adds
+    await page.route('**/*adsbygoogle*', route => route.abort());
+
     //Verify that home page is visible successfully
     await expect(page.locator('#slider')).toBeVisible();
 
-    //click Products button
-    await page.locator('.card_travel').click();
+    //Click Products button
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+
+    //допълнително правя проверка за дейтайлите на продуктите 1 и 2 -> view product
+    await page.locator('.product-image-wrapper').locator('i.fa-plus-square').first().click();
+    const productDescription: string = (await page.locator('.product-information h2').textContent())!;
+    const productPrice: string = (await page.locator('.product-information span span').textContent())!.trim();
+
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+
+    await page.locator('.product-image-wrapper').locator('i.fa-plus-square').nth(1).click();
+    const productDescription2: string = (await page.locator('.product-information h2').textContent())!;
+    const productPrice2: string = (await page.locator('.product-information span span').textContent())!.trim();
 
     //Add products to cart 
-    const firstItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('[data-product-id="1"]') });
-    await firstItem.hover();
-    const addToCart: Locator = page.locator('.overlay-content').filter({ has: page.locator('[data-product-id="1"]') });
-    const cartButton: Locator = addToCart.locator('.fa-shopping-cart');
-    await cartButton.click();
+    await page.locator('ul.navbar-nav a[href="/products"]').click();
 
-    //Click 'Continue
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+    const firstItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('a[data-product-id="1"]') });
+    await firstItem.hover();
+    firstItem.locator('.overlay-content').locator('a[data-product-id="1"]').click();
+
+    //Click 'Continue Shopping' button
     await expect(page.locator('#cartModal')).toBeVisible();
     await page.locator('.btn-block').click();
 
-    //second product and click 'Add to cart'
-    const secondItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('[data-product-id="2"]') });
+    //Hover over second product and click 'Add to cart'
+    await page.locator('a', { has: page.locator('i.card_travel') }).click();
+    const secondItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('a[data-product-id="2"]') });
     await secondItem.hover();
-    const addToCart2: Locator = page.locator('.overlay-content').filter({ has: page.locator('[data-product-id="2"]') });
-    const cartButton2: Locator = addToCart2.locator('.fa-shopping-cart');
-    await cartButton2.click();
+    await secondItem.locator('.overlay-content').locator('a[data-product-id="2"]').click();
 
     //Click 'View Cart' button
-    await expect(page.locator('#cartModal')).toBeVisible();
-    const viewCart: Locator = page.locator('.modal-body a[href="/view_cart"]');
-    await viewCart.click();
+    await page.locator('a[href="/view_cart"]', {
+        has: page.locator('i.fa-shopping-cart')
+    }).filter({
+        hasText: 'Cart'
+    }).click();
+
 
     //Verify that cart page is displayed
     await expect(page).toHaveURL('https://automationexercise.com/view_cart');
+
+    const productCartQuantity: string = (await page.locator('#product-1 .cart_quantity').textContent())!.trim();
+    const productTotalPrice: string = (await page.locator('#product-1 .cart_total_price').textContent())!.trim();
+    const productCartQuantity2: string = (await page.locator('#product-2 .cart_quantity').textContent())!.trim();
+    const productTotalPrice2: string = (await page.locator('#product-2 .cart_total_price').textContent())!.trim();
 
     //Click Proceed To Checkout
     await page.locator('.btn-default.check_out').click();
 
     //Click 'Register / Login' button
     await expect(page.locator('#checkoutModal')).toBeVisible();
-    const checkOutCart: Locator = page.locator('.modal-body a[href="/login"]');
-    await checkOutCart.click();
+    await page.locator('.modal-body a[href="/login"]').click();
 
     //Verify 'New User Signup!' is visible
-    expect(await page.locator('div.signup-form')).toContainText('New User Signup!');
+    await expect(page.locator('div.signup-form h2')).toHaveText("New User Signup!");
 
-    //the code below is as in the Login.test.ts; should be updated
     //Enter name and email address
-    const userName: string = "TEST";
-    const email: string = config.email;
-    await page.locator('input[data-qa="signup-name"]').fill(userName);
-    await page.locator('input[data-qa="signup-email"]').fill(email);
+    await page.locator('input[data-qa="signup-name"]').fill(config.userName);
+    await page.locator('input[data-qa="signup-email"]').fill(config.email14);
 
     //Click 'Signup' button
     await page.locator('button[data-qa="signup-button"]').click();
 
     //Verify that 'ENTER ACCOUNT INFORMATION' is visible
-    await expect(page.locator('div.login-form')).toContainText('Enter Account Information');
+    await expect(page.locator('div.login-form h2').first()).toHaveText('Enter Account Information');
 
     //Fill details: Title, Name, Email, Password, Date of birth
-    const inputName: string | null = await page.locator('#name').inputValue();
-    console.log(inputName);
-    await expect(inputName).toBe(userName);
 
-    const inputEmail: string | null = await page.locator('#email').inputValue();
-    console.log(inputEmail);
-    await expect(inputEmail).toBe(email);
+    await expect(page.locator('#name')).toHaveValue(config.userName);
+    await expect(page.locator('#email')).toHaveValue(config.email14);
 
     await page.locator('#uniform-id_gender2').click();
-    await page.locator('#password').fill('test');
+    await page.locator('#password').fill(config.password);
 
     //date of birth
     await page.locator('#days').selectOption('17');
@@ -112,64 +126,113 @@ test('Order - register while checkout', async ({ page }) => {
     await page.locator('button[data-qa="create-account"]').click();
 
     //Verify that 'ACCOUNT CREATED!' is visible
-    await expect(page.locator('h2[data-qa="account-created"]')).toContainText('Account Created!');
+    await expect(page.locator('h2[data-qa="account-created"]')).toHaveText('Account Created!');
 
     //Click 'Continue' button
-    await page.locator('.btn[data-qa="continue-button"]').click();
+    await page.locator('a[data-qa="continue-button"]').click();
 
-    //Verify ' Logged in as username' at top
-    const valueUserName: string | null = await (page.locator('a:has(i.fa-user)').textContent());
-    const trimmedValue: string = (valueUserName as string).trim();
-    await expect(trimmedValue).toBe(`Logged in as ${userName}`);
+    //Verify that 'Logged in as username' is visible
+    const valueUserName: string = (await page.locator("a", { has: page.locator("i.fa-user") }).textContent())!.trim();
+    expect(valueUserName).toBe(`Logged in as ${config.userName}`);
 
     //Click 'Cart' button
-    await page.locator('.navbar-nav a[href="/view_cart"]').click();
+    await page.locator('a[href="/view_cart"]', {
+        has: page.locator('i.fa-shopping-cart')
+    }).filter({
+        hasText: 'Cart'
+    }).click();
+
 
     //Click Proceed To Checkout
     await page.locator('.btn-default.check_out').click();
 
     //Verify Address Details and Review Your Order
-    await expect(page.locator('.step-one').filter({ hasText: "Address Details" })).toBeVisible();
+    await expect(page.locator('.step-one .heading').first()).toHaveText("Address Details");
 
-    const firstNameValue: string | null = await page.locator('#address_delivery .address_firstname').textContent();
-    expect(firstNameValue).toContain(`Mrs. ${firstName} ${lastName}`);
+    const firstNameValue: string = (await page.locator('#address_delivery .address_firstname').textContent())!;
+    expect(firstNameValue).toBe(`Mrs. ${firstName} ${lastName}`);
 
     //company
     const companyValue: string = await page.locator('#address_delivery .address_address1.address_address2').first().innerText();
-    expect(companyValue).toContain(company);
+    expect(companyValue).toBe(company);
 
     //address1
     const addressValue: string = await page.locator('#address_delivery .address_address1.address_address2').nth(1).innerText();
-    expect(addressValue).toContain(address1);
+    expect(addressValue).toBe(address1);
 
     //address2
     const addressValue2: string = await page.locator('#address_delivery .address_address1.address_address2').last().innerText();
-    expect(addressValue2).toContain(address2);
+    expect(addressValue2).toBe(address2);
 
-    const zipCodeValue: string | null = await page.locator('#address_delivery .address_postcode').textContent();
+    const zipCodeValue: string = (await page.locator('#address_delivery .address_postcode').textContent())!;
     const cleanZipCode: string = (zipCodeValue as string).replace(/\s+/g, ' ').trim();
-    expect(cleanZipCode).toContain(`${city} ${state} ${zipCode}`);
+    expect(cleanZipCode).toBe(`${city} ${state} ${zipCode}`);
 
-    const countryValue: string | null = await page.locator('#address_delivery .address_country_name').textContent();
-    expect(countryValue).toContain(country);
+    const countryValue: string = (await page.locator('#address_delivery .address_country_name').textContent())!;
+    expect(countryValue).toBe(country);
 
-    const mobileValue: string | null = await page.locator('#address_delivery .address_phone').textContent();
-    expect(mobileValue).toContain(mobile);
+    const mobileValue: string = (await page.locator('#address_delivery .address_phone').textContent())!;
+    expect(mobileValue).toBe(mobile);
 
     //Verify that the billing address is same address filled at the time registration of account
-    const firstNameValue2: string | null = await page.locator('#address_invoice .address_firstname').textContent();
-    expect(firstNameValue2).toContain(`Mrs. ${firstName} ${lastName}`);
+    const firstNameValue2: string = (await page.locator('#address_invoice .address_firstname').textContent())!;
+    expect(firstNameValue2).toBe(`Mrs. ${firstName} ${lastName}`);
 
-    const zipCodeValue2: string | null = await page.locator('#address_invoice .address_postcode').textContent();
-    const cleanZipCode2: string | null = (zipCodeValue2 as string).replace(/\s+/g, ' ').trim();
-    expect(cleanZipCode2).toContain(`${city} ${state} ${zipCode}`);
+    const zipCodeValue2: string = (await page.locator('#address_invoice .address_postcode').textContent())!;
+    const cleanZipCode2: string = ((zipCodeValue2 as string).replace(/\s+/g, ' ').trim())!;
+    expect(cleanZipCode2).toBe(`${city} ${state} ${zipCode}`);
 
-    const countryValue2: string | null = await page.locator('#address_invoice .address_country_name').textContent();
-    expect(countryValue2).toContain(country);
+    const countryValue2: string = (await page.locator('#address_invoice .address_country_name').textContent())!;
+    expect(countryValue2).toBe(country);
 
-    const mobileValue2: string | null = await page.locator('#address_invoice .address_phone').textContent();
-    expect(mobileValue2).toContain(mobile);
+    const mobileValue2: string = (await page.locator('#address_invoice .address_phone').textContent())!;
+    expect(mobileValue2).toBe(mobile);
 
+    //Review Your Order verification
+    await expect(page.locator('.step-one .heading').last()).toHaveText("Review Your Order");
+
+    const cartTableRows: number = await page.locator('tbody tr[id^="product-"]').count();
+    expect(cartTableRows).toEqual(2);
+
+    //дефиниране на променливи за детайлите на продуктите в Product page; проверка на данните в review your order спрямо product page
+
+    const cartTableProduct1: Locator = page.locator('tbody tr[id="product-1"]');
+
+    const cartDescription: string = (await cartTableProduct1.locator('.cart_description h4').textContent())!.trim();
+    //const cartPrice: string = (await cartTableProduct1.locator('.cart_price').textContent())!.trim();
+    const rawTextPrice = await cartTableProduct1.locator('.cart_price').textContent();
+    const cartPrice: string = rawTextPrice ? rawTextPrice.replace(/\s+/g, '') : '';
+
+    //const cartQuantity: string = (await cartTableProduct1.locator('.cart_quantity').textContent())!.trim();
+    const rawTextQuantity = await cartTableProduct1.locator('.cart_quantity').textContent();
+    const cartQuantity: string = rawTextQuantity ? rawTextQuantity.replace(/\s+/g, '') : '';
+
+    const cartTotal: string = (await cartTableProduct1.locator('.cart_total').textContent())!.trim();
+
+    expect(cartDescription).toBe(productDescription);
+    //expect(cartPrice).toBe(productPrice);
+    console.log(cartPrice);
+    console.log(productPrice);
+    expect(cartQuantity).toBe(productCartQuantity);
+    expect(cartTotal).toBe(productTotalPrice);
+
+    const cartTableProduct2: Locator = page.locator('tbody tr[id="product-2"]');
+
+    const cartDescription2: string = (await cartTableProduct2.locator('.cart_description h4').textContent())!.trim();
+    //const cartPrice2: string = (await cartTableProduct2.locator('.cart_price').textContent())!.trim();
+    const rawTextPrice2 = await cartTableProduct2.locator('.cart_price').textContent();
+    const cartPrice2: string = rawTextPrice2 ? rawTextPrice2.replace(/\s+/g, '') : '';
+
+    //const cartQuantity2: string = (await cartTableProduct2.locator('.cart_quantity').textContent())!.trim();
+    const rawTextQuantity2 = await cartTableProduct2.locator('.cart_quantity').textContent();
+    const cartQuantity2: string = rawTextQuantity2 ? rawTextQuantity2.replace(/\s+/g, '') : '';
+
+    const cartTotal2: string = (await cartTableProduct2.locator('.cart_total').textContent())!.trim();
+
+    expect(cartDescription2).toBe(productDescription2);
+    //expect(cartPrice2).toBe(productPrice2);
+    expect(cartQuantity2).toBe(cartQuantity2);
+    expect(cartTotal2).toBe(productTotalPrice2);
 
     // Enter description in comment text area and click 'Place Order'
     await page.locator('.form-control').fill('order this clothes');
@@ -177,26 +240,26 @@ test('Order - register while checkout', async ({ page }) => {
 
     //Enter payment details: Name on Card, Card Number, CVC, Expiration date
     await expect(page.locator('.step-one').filter({ hasText: "Payment" })).toBeVisible();
-    await page.locator('[data-qa="name-on-card"]').fill('test test');
-    await page.locator('[data-qa="card-number"]').fill('testtest');
-    await page.locator('[data-qa="cvc"]').fill('tst');
-    await page.locator('[data-qa="expiry-month"]').fill('mm');
-    await page.locator('[data-qa="expiry-year"]').fill('yyyy');
+    await page.locator('input[data-qa="name-on-card"]').fill('test test');
+    await page.locator('input[data-qa="card-number"]').fill('testtest');
+    await page.locator('input[data-qa="cvc"]').fill('tst');
+    await page.locator('input[data-qa="expiry-month"]').fill('mm');
+    await page.locator('input[data-qa="expiry-year"]').fill('yyyy');
 
     //Click 'Pay and Confirm Order' button
     //Verify success message 'Your order has been placed successfully!'
     const [messageText] = await Promise.all([
         page.locator('#success_message').textContent(), // хващаме текста веднага
-        page.click('[data-qa="pay-button"]'), // кликът, който задейства и съобщението, и навигацията
+        page.click('button[data-qa="pay-button"]'), // кликът, който задейства и съобщението, и навигацията
         page.waitForLoadState() // изчакваме навигацията след това
     ]);
+    expect(messageText?.trim()).toBe('Your order has been placed successfully!');
 
-    console.log('Success message:', messageText);
     //Click 'Delete Account' button
-    await page.locator('.fa-trash-o').click();
+    await page.locator('a', { has: page.locator('i.fa-trash-o') }).click();
 
-    //Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button    
-    await expect(page.locator('[data-qa="account-deleted"]')).toBeVisible();
-    await page.locator('.btn[data-qa="continue-button"]').click();
+    //Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
+    await expect(page.locator('h2[data-qa="account-deleted"]')).toHaveText('Account Deleted!');
+    await page.locator('a[data-qa="continue-button"]').click();
 
 });
