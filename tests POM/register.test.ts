@@ -16,7 +16,7 @@ test('Register', async ({ page }) => {
 
 
     await signUpPage.signUp(
-        'Мr',
+        'Mr',
         'test',
         '1',
         '2',

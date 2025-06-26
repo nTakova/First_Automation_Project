@@ -61,7 +61,7 @@ export class SignUpPage {
     }
 
     async signUp(
-        gender: 'Мr' | 'Мrs',
+        gender: 'Mr' | 'Mrs',
         password: string,
         date: string,
         month: string,
