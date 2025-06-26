@@ -235,13 +235,13 @@ test('Order - register before checkout', async ({ page }) => {
     await page.locator('input[data-qa="expiry-year"]').fill('yyyy');
 
     //Click 'Pay and Confirm Order' button
+    //Verify success message 'Your order has been placed successfully!'
 
     const [messageText] = await Promise.all([
         page.locator('#success_message').textContent(), // хващаме текста веднага
         page.click('button[data-qa="pay-button"]'), // кликът, който задейства и съобщението, и навигацията
         page.waitForLoadState() // изчакваме навигацията след това
     ]);
-    console.log('Success message:', messageText);
     expect(messageText?.trim()).toBe('Your order has been placed successfully!');
 
     //Click 'Delete Account' button

@@ -23,8 +23,7 @@ test('Add to Shopping cart', async ({ page }) => {
   await page.locator('#submit_search').click();
 
   //Verify 'SEARCHED PRODUCTS' is visible
-  const searchText: Locator = page.locator('.title.text-center');
-  await expect(searchText).toHaveText('Searched Products');
+  await expect(page.locator('.title.text-center')).toHaveText('Searched Products');
 
   //Verify all the products related to search are visible
   const products: Locator = page.locator('.productinfo.text-center');

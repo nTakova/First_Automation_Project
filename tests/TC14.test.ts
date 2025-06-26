@@ -248,11 +248,19 @@ test('Order - register while checkout', async ({ page }) => {
 
     //Click 'Pay and Confirm Order' button
     //Verify success message 'Your order has been placed successfully!'
+    /*
     const [messageText] = await Promise.all([
         page.locator('#success_message').textContent(), // хващаме текста веднага
         page.click('button[data-qa="pay-button"]'), // кликът, който задейства и съобщението, и навигацията
         page.waitForLoadState() // изчакваме навигацията след това
     ]);
+
+    expect(messageText?.trim()).toBe('Your order has been placed successfully!');
+    */
+
+    await page.locator('button[data-qa="pay-button"]').click();
+    const messageText = page.locator('#success_message').textContent();
+    page.waitForLoadState("load");
     expect(messageText?.trim()).toBe('Your order has been placed successfully!');
 
     //Click 'Delete Account' button

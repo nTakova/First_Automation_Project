@@ -27,8 +27,6 @@ test('Add review on product', async ({ page }) => {
     await page.locator('#review').fill('test');
 
     //Click 'Submit' button
-    await page.locator('#button-review').click();
-
     //Verify success message 'Thank you for your review.'
     const [messageText] = await Promise.all([
         page.locator('#review-section').textContent(), // хващаме текста веднага

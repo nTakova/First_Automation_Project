@@ -247,8 +247,6 @@ test('Add to Shopping cart', async ({ page }) => {
     await page.locator('input[data-qa="expiry-year"]').fill('yyyy');
 
     //Click 'Pay and Confirm Order' button
-    //await page.locator('[data-qa="pay-button"]').click();
-
     //Verify success message 'Your order has been placed successfully!'
     const [messageText] = await Promise.all([
         page.locator('#success_message').textContent(), // хващаме текста веднага
@@ -262,8 +260,11 @@ test('Add to Shopping cart', async ({ page }) => {
     await page.locator('.check_out').click();
     const download = await downloadPromise;
 
-    await download.saveAs('./' + download.suggestedFilename());
-    const fileCheck = fs.existsSync('./');
+    //await download.saveAs('./' + download.suggestedFilename());
+    const filePathName: string = './' + download.suggestedFilename();
+    await download.saveAs(filePathName);
+    //const fileCheck = fs.existsSync('./');
+    const fileCheck = fs.existsSync(filePathName);
     expect(fileCheck).toBeTruthy();
 
     //Click 'Continue' button
