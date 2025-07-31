@@ -10,7 +10,7 @@ test('Product quantity', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on 'View product'
-    await page.locator('.product-image-wrapper a[href="/product_details/2"]').click();
+    await page.locator('div.product-image-wrapper a[href="/product_details/2"]').click();
 
     //Verify product detail is opened
     await expect(page).toHaveURL('https://automationexercise.com/product_details/2');
@@ -19,15 +19,13 @@ test('Product quantity', async ({ page }) => {
     await page.locator('#quantity').fill('4');
 
     //Click 'Add to cart' button
-    await page.locator('.product-information').locator('.fa-shopping-cart').click();
+    await page.locator('div.product-information').locator('.fa-shopping-cart').click();
 
     //Click 'View Cart' button
-    await page.locator('.modal-content').locator('.modal-body a[href="/view_cart"]').click();
+    await page.locator('div.modal-body a', { hasText: 'View Cart' }).click();
 
     //Verify that product is displayed in cart page with exact quantity
-    const quantityText: string = (await page.locator('.cart_quantity').textContent())!;
+    const quantityText: string = (await page.locator('td.cart_quantity').textContent())!.trim();
     expect(quantityText?.trim()).toBe('4');
-
-
 
 });

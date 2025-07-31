@@ -16,22 +16,21 @@ test('Add to Shopping cart', async ({ page }) => {
     await page.locator('a', { has: page.locator('i.card_travel') }).click();
 
     //Hover over first product and click 'Add to cart'
-    const firstItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('a[data-product-id="1"]') });
+    const firstItem: Locator = page.locator('div.product-image-wrapper').filter({ has: page.locator('a[data-product-id="1"]') });
     await firstItem.hover();
-    await firstItem.locator('.overlay-content').locator('a[data-product-id="1"]').click();
+    await firstItem.locator('div.overlay-content').locator('a[data-product-id="1"]').click();
 
     //Click 'Continue Shopping' button
-    await expect(page.locator('.modal-content')).toBeVisible();
-    await page.locator('.btn-block').click();
+    await expect(page.locator('div.modal-content')).toBeVisible();
+    await page.locator('button.btn-block').click();
 
     //Hover over second product and click 'Add to cart'
-    const secondItem: Locator = page.locator('.product-image-wrapper').filter({ has: page.locator('a[data-product-id="2"]') });
+    const secondItem: Locator = page.locator('div.product-image-wrapper').filter({ has: page.locator('a[data-product-id="2"]') });
     await secondItem.hover();
-    await secondItem.locator('.overlay-content').locator('a[data-product-id="2"]').click();
+    await secondItem.locator('div.overlay-content').locator('a[data-product-id="2"]').click();
 
     //Click 'View Cart' button
-    await expect(page.locator('.modal-content')).toBeVisible();
-    await page.locator('.modal-body a[href="/view_cart"]').click();
+    await page.locator('div.modal-body a', { hasText: 'View Cart' }).click();
 
     //Verify both products are added to Cart
     await expect(page.locator('#product-1')).toBeVisible();

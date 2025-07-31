@@ -21,10 +21,10 @@ test('Search product', async ({ page }) => {
     await page.locator('#submit_search').click();
 
     //Verify 'SEARCHED PRODUCTS' is visible
-    await expect(page.locator('.title.text-center')).toHaveText('Searched Products');
+    await expect(page.locator('h2.title.text-center')).toHaveText('Searched Products');
 
     //Verify all the products related to search are visible
-    const products: Locator = page.locator('.productinfo.text-center');
+    const products: Locator = page.locator('div.productinfo.text-center');
 
     const productCount: number = await products.count();
     for (let i = 0; i < productCount; i++) {

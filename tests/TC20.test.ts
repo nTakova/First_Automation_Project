@@ -23,49 +23,38 @@ test('Add to Shopping cart', async ({ page }) => {
   await page.locator('#submit_search').click();
 
   //Verify 'SEARCHED PRODUCTS' is visible
-  await expect(page.locator('.title.text-center')).toHaveText('Searched Products');
+  await expect(page.locator('h2.title.text-center')).toHaveText('Searched Products');
 
   //Verify all the products related to search are visible
-  const products: Locator = page.locator('.productinfo.text-center');
+  const products: Locator = page.locator('div.productinfo.text-center');
 
   const productCount: number = await products.count();
   for (let i = 0; i < productCount; i++) {
     const product: Locator = products.nth(i);
-    const name: string = await product.locator('p').innerText();
-    expect(name.toLowerCase()).toContain('s'); // търся само "S", за да не фейлва теста тук, а да проверя, че работи
+    const productName: string = await product.locator('p').innerText();
+    expect(productName.toLowerCase()).toContain('s'); // търся само "S", за да не фейлва теста тук, а да проверя, че работи
   }
 
   // Add those products to cart
-
   for (let i = 0; i < productCount; i++) {
     const product: Locator = products.nth(i);
-
-    // Hover, за да се покаже бутонът (ако е необходимо)
     await product.hover();
 
     // "Add to cart"
-    const addToCartButton: Locator = product.locator('a').filter({ hasText: 'Add to cart' });
-    await addToCartButton.click();
+    await product.locator('a').filter({ hasText: 'Add to cart' }).click();
 
     // Click Continue shopping
-    await expect(page.locator('.modal-content')).toBeVisible();
-    await page.locator('.btn-block').click();
+    await expect(page.locator('div.modal-content')).toBeVisible();
+    await page.locator('button.btn-block').click();
   }
+
   // Click 'Cart' button and verify that products are visible in cart
-  await page.locator('a[href="/view_cart"]', {
-    has: page.locator('i.fa-shopping-cart')
-  }).filter({
-    hasText: 'Cart'
-  }).click();
+  await page.locator('ul.navbar-nav a', { has: page.locator('i.fa-shopping-cart') }).click();
 
   // Verify that the produts are in the Cart
-  const cartItems: Locator = page.locator('.cart_description'); // или друг точен селектор
-  await expect(cartItems.first()).toBeVisible();
-
+  const cartItems: Locator = page.locator('td.cart_description');
   const cartItemCount: number = await cartItems.count();
-  expect(cartItemCount).toBeGreaterThan(0);
-
-  //console.log(` ${cartItemCount} products in the cart`);
+  expect(cartItemCount).toBe(productCount);
 
   // Click 'Signup / Login' button and submit login details
   await page.locator('a', { has: page.locator('i.fa-lock') }).click();
@@ -124,10 +113,9 @@ test('Add to Shopping cart', async ({ page }) => {
   expect(valueUserName).toBe(`Logged in as ${config.userName}`);
 
   //  Again, go to Cart page
-  await page.locator('[href="/view_cart"]').filter({ has: page.locator('i.fa-shopping-cart') }).click();
+  await page.locator('ul.navbar-nav a', { has: page.locator('i.fa-shopping-cart') }).click();
 
   // Verify that those products are visible in cart after login as well
-  await expect(cartItems.first()).toBeVisible();
-  expect(cartItemCount).toBeGreaterThan(0);
+  expect(cartItemCount).toBe(productCount);
 
 });
