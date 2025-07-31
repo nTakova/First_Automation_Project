@@ -11,9 +11,8 @@ test('Register', async ({ page }) => {
     await loginPage.navigate();
     await page.getByRole('button', { name: 'Consent' }).click();
 
-    await loginPage.signUp('test', 'regTest@mail.com');
+    await loginPage.signUp('test', 'regTest1@mail1.com');
     //await signUpPage.navigate();
-
 
     await signUpPage.signUp(
         'Mr',

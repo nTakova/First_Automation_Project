@@ -24,6 +24,6 @@ test('Existing email', async ({ page }) => {
     await page.locator('button[data-qa="signup-button"]').click();
 
     //Verify error 'Email Address already exist!' is visible
-    await expect(page.locator('.signup-form p')).toHaveText('Email Address already exist!');
+    await expect(page.locator('div.signup-form p')).toHaveText('Email Address already exist!');
 
 });

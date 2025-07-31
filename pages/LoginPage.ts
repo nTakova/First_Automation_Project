@@ -20,6 +20,7 @@ export class LoginPage {
         this.signUpEmail = page.locator('input[data-qa="signup-email"]');
         this.sigunUpButton = page.locator('button[data-qa="signup-button"]');
     }
+
     async navigate() {
         await this.page.goto('https://automationexercise.com/login');
 

@@ -19,7 +19,7 @@ test('Add review on product', async ({ page }) => {
     await page.locator('ul.nav-pills a[href="/product_details/1"]').click();
 
     //Verify 'Write Your Review' is visible
-    await expect(page.locator('.nav-tabs')).toHaveText('Write Your Review');
+    await expect(page.locator('ul.nav-tabs')).toHaveText('Write Your Review');
 
     //Enter name, email and review
     await page.locator('#name').fill('test');

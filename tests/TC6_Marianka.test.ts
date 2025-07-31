@@ -14,7 +14,7 @@ test("Contact form", async ({ page }) => {
   await page.locator('a', { has: page.locator('i.fa-envelope') }).click();
 
   // Verify 'GET IN TOUCH' is visible
-  await expect(page.locator('.contact-form .text-center')).toHaveText('Get In Touch');
+  await expect(page.locator('div.contact-form h2.text-center')).toHaveText('Get In Touch');
 
   // Enter name, email, subject and message
   await page.locator('input[data-qa="name"]').fill("test");
@@ -40,6 +40,6 @@ test("Contact form", async ({ page }) => {
   await expect(page.locator('div.status.alert.alert-success')).toHaveText('Success! Your details have been submitted successfully.');
 
   // Click 'Home' button and verify landing on home page
-  await page.locator(".contact-form .btn").click();
+  await page.locator("div.contact-form a.btn").click();
   await expect(page).toHaveURL("https://automationexercise.com/");
 });

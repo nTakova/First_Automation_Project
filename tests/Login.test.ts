@@ -27,8 +27,8 @@ test('Create account', async ({ page }) => {
     await expect(page.locator('div.login-form h2').first()).toHaveText('Enter Account Information');
 
     //Fill details: Title, Name, Email, Password, Date of birth
-    await expect(page.locator('#name')).toHaveValue(userName);
-    await expect(page.locator('#email')).toHaveValue(email);
+    await expect(page.locator('#name')).toHaveValue(config.userName);
+    await expect(page.locator('#email')).toHaveValue(config.email);
 
     await page.locator('#uniform-id_gender2').click();
     await page.locator('#password').fill(config.password);
@@ -67,7 +67,7 @@ test('Create account', async ({ page }) => {
 
     //Verify that 'Logged in as username' is visible
     const valueUserName: string = (await page.locator("a", { has: page.locator("i.fa-user") }).textContent())!.trim();
-    expect(valueUserName).toBe(`Logged in as ${userName}`);
+    expect(valueUserName).toBe(`Logged in as ${config.userName}`);
 
     /* закоментирам изтриването на аканута, за да го използвам за следващите тестове
     //Click 'Delete Account' button

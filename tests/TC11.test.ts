@@ -10,7 +10,7 @@ test('Subscription', async ({ page }) => {
     await expect(page.locator('#slider')).toBeVisible();
 
     //Click on 'Cart' button
-    await page.locator('a[href="/view_cart"]', { has: page.locator('i.fa-shopping-cart') }).filter({ hasText: 'Cart' }).click();
+    await page.locator('ul.navbar-nav a', { has: page.locator('i.fa-shopping-cart') }).click();
 
     //Verify user is navigated to CART page successfully
     await expect(page).toHaveURL('https://automationexercise.com/view_cart');

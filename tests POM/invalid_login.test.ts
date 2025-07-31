@@ -10,7 +10,7 @@ test('invalid login', async ({ page }) => {
 
     await loginPage.login('test@mail.com', 'test');
 
-    await expect(page.locator('[action="/login"] p')).toContainText('Your email or password is incorrect!');
+    await expect(page.locator('form[action = "/login"] p')).toContainText('Your email or password is incorrect!');
 
 
 });
