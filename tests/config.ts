@@ -1,9 +1,10 @@
 export const config = {
-  email: 'test@qa.3',
+  email: 'testWednesday4@qa.test1',
   password: 'test',
   userName: 'TEST',
-  email14: 'test2@qa.3',
-  email15: 'test4@qa.3',
-  email20: 'test5@qa.3', 
-  email23: 'test6@qa.3'
+  email14: 'testThursday@test14.qa',
+  email15: 'testMonday7@test15.qa',
+  email20: 'testWednesday8@test20.qa',
+  email23: 'testWednesday1@test23.qa',
+  email24: 'testWednesday2@test24.qa'
 };
